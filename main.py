@@ -1,3 +1,5 @@
+import speech_recognition as sr
+
 def run_greeting():
     pass
 
@@ -23,7 +25,16 @@ def get_joke():
     pass
 
 def listen():
-    pass
+    speech,r = '', sr.Recognizer()
+    with sr.Microphone() as source:
+        r.adjust_for_ambient_noise(source, duration=2)
+        print('Say something...')
+        audio = r.listen(source)
+    try:
+        speech = r.recognize_google(audio).lower()
+        print('You said: ' + speech + '\n')
+    except sr.UnknownValueError or sr.RequestError: print('....')
+    finally: return speech
 
 def say(text):
     pass
