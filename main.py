@@ -1,3 +1,4 @@
+import pyttsx3
 import speech_recognition as sr
 
 def run_greeting():
@@ -37,7 +38,12 @@ def listen():
     finally: return speech
 
 def say(text):
-    pass
+    engine = pyttsx3.init()
+    engine.setProperty('voice', engine.getProperty('voices')[1].id)
+    engine.setProperty('rate', 130)
+    engine.say(text)
+    engine.runAndWait()
+    engine.stop()
 
 def assistant(text_speech):
     pass
