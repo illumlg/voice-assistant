@@ -1,4 +1,6 @@
+import re
 import sys
+import webbrowser
 
 import pyttsx3
 import speech_recognition as sr
@@ -19,7 +21,15 @@ def shutdown():
     sys.exit()
 
 def open_website(name):
-    pass
+    reg_ex = re.search('open (.+)', name)
+    if reg_ex:
+        domain = reg_ex.group(1)
+        print(domain)
+        url = 'https://www.' + domain
+        webbrowser.open(url)
+        say('The website you have requested has been successfully opened for you, Sir.')
+    else:
+        pass
 
 def get_weather(city):
     pass
