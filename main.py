@@ -1,11 +1,12 @@
 import re
 import sys
 import webbrowser
-
 import pyttsx3
 import speech_recognition as sr
+from pyowm import OWM
 
 from time import strftime
+
 
 def run_greeting():
     time = int(strftime('%H'))
@@ -16,9 +17,11 @@ def run_greeting():
     else:
         say('Hello Sir. Good evening')
 
+
 def shutdown():
     say('Goodbye Sir. Have a pleasant day')
     sys.exit()
+
 
 def open_website(name):
     reg_ex = re.search('open (.+)', name)
@@ -31,23 +34,49 @@ def open_website(name):
     else:
         pass
 
-def get_weather(city):
-    pass
+
+def get_weather(cityPhrase):
+    reg_ex = re.search('weather in (.*)', cityPhrase)
+    if reg_ex:
+        city = reg_ex.group(1)
+
+        owm = OWM('ab0d5e80e8dafb2cb81fa9e82431c1fa')
+        manager = owm.weather_manager()
+        weather = manager.weather_at_place(city).weather
+
+        status = weather.status
+        detailedStatus = weather.detailed_status
+        temperature = weather.temperature('celsius')
+        humidity = weather.humidity
+
+        weather_report = 'Current weather in %s is %s (%s). The temperature is %0.1f degree celcius,' \
+                         ' feels like is %0.1f. The humidity is %s percents' % (
+                             city, status, detailedStatus, temperature['temp'], temperature['feels_like'], humidity)
+
+        print(weather_report)
+        say(weather_report)
+    else:
+        pass
+
 
 def get_localtime():
     pass
 
+
 def get_news(limit):
     pass
+
 
 def search_topic(topic):
     pass
 
+
 def get_joke():
     pass
 
+
 def listen():
-    speech,r = '', sr.Recognizer()
+    speech, r = '', sr.Recognizer()
     with sr.Microphone() as source:
         r.adjust_for_ambient_noise(source, duration=2)
         print('Say something...')
@@ -55,8 +84,11 @@ def listen():
     try:
         speech = r.recognize_google(audio).lower()
         print('You said: ' + speech + '\n')
-    except sr.UnknownValueError or sr.RequestError: print('....')
-    finally: return speech
+    except sr.UnknownValueError or sr.RequestError:
+        print('....')
+    finally:
+        return speech
+
 
 def say(text):
     engine = pyttsx3.init()
@@ -65,6 +97,7 @@ def say(text):
     engine.say(text)
     engine.runAndWait()
     engine.stop()
+
 
 def assistant(text_speech):
     pass
