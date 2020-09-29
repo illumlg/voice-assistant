@@ -1,5 +1,7 @@
+from pygooglenews import GoogleNews
 import pyttsx3
 import speech_recognition as sr
+
 
 def run_greeting():
     pass
@@ -16,8 +18,14 @@ def get_weather(city):
 def get_localtime():
     pass
 
-def get_news(limit):
-    pass
+def get_news(limit=4):
+    try:
+        google_news = GoogleNews().top_news()['entries']
+        limit = limit if 0 <= limit <= len(google_news) else len(google_news)
+        for news in google_news[:limit]:
+            print(news['title'],'\n',news['link'])
+            say(news['title'])
+    except Exception as e: print(e)
 
 def search_topic(topic):
     pass
