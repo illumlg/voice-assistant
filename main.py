@@ -1,3 +1,5 @@
+import re
+
 import pyttsx3
 import speech_recognition as sr
 from pyowm import OWM
@@ -11,22 +13,26 @@ def shutdown():
 def open_website(name):
     pass
 
-def get_weather(city):
-    owm = OWM('ab0d5e80e8dafb2cb81fa9e82431c1fa')
-    manager = owm.weather_manager()
-    weather = manager.weather_at_place(city).weather
+def get_weather(cityPhrase):
+    reg_ex = re.search('weather in (.*)', cityPhrase)
+    if reg_ex:
+        city = reg_ex.group(1)
 
-    status = weather.status
-    detailedStatus = weather.detailed_status
-    temperature = weather.temperature('celsius')
-    humidity = weather.humidity
+        owm = OWM('ab0d5e80e8dafb2cb81fa9e82431c1fa')
+        manager = owm.weather_manager()
+        weather = manager.weather_at_place(city).weather
 
-    weather_report = 'Current weather in %s is %s (%s). The temperature is %0.1f degree celcius,' \
-                     ' feels like is %0.1f. The humidity is %s percents' % (
-                         city, status, detailedStatus, temperature['temp'], temperature['feels_like'], humidity)
+        status = weather.status
+        detailedStatus = weather.detailed_status
+        temperature = weather.temperature('celsius')
+        humidity = weather.humidity
 
-    print(weather_report)
-    say(weather_report)
+        weather_report = 'Current weather in %s is %s (%s). The temperature is %0.1f degree celcius,' \
+                         ' feels like is %0.1f. The humidity is %s percents' % (
+                             city, status, detailedStatus, temperature['temp'], temperature['feels_like'], humidity)
+
+        print(weather_report)
+        say(weather_report)
 
 
 def get_localtime():
