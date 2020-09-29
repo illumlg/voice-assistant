@@ -1,11 +1,11 @@
+from pygooglenews import GoogleNews
+import pyttsx3
+import speech_recognition as sr
 import re
 import sys
 import webbrowser
-import pyttsx3
-import speech_recognition as sr
 import datetime
 from pyowm import OWM
-
 from time import strftime
 
 
@@ -65,8 +65,14 @@ def get_localtime():
     say('Current time is %d hours %d minutes' % (now.hour, now.minute))
 
 
-def get_news(limit):
-    pass
+def get_news(limit=4):
+    try:
+        google_news = GoogleNews().top_news()['entries']
+        limit = limit if 0 <= limit <= len(google_news) else len(google_news)
+        for news in google_news[:limit]:
+            print(news['title'],'\n',news['link'])
+            say(news['title'])
+    except Exception as e: print(e)
 
 
 def search_topic(topic):
