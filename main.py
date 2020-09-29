@@ -1,17 +1,39 @@
 import re
-
+import sys
+import webbrowser
 import pyttsx3
 import speech_recognition as sr
 from pyowm import OWM
 
+from time import strftime
+
+
 def run_greeting():
-    pass
+    time = int(strftime('%H'))
+    if 4 <= time < 12:
+        say('Hello Sir. Good morning')
+    elif 12 <= time < 18:
+        say('Hello Sir. Good afternoon')
+    else:
+        say('Hello Sir. Good evening')
+
 
 def shutdown():
-    pass
+    say('Goodbye Sir. Have a pleasant day')
+    sys.exit()
+
 
 def open_website(name):
-    pass
+    reg_ex = re.search('open (.+)', name)
+    if reg_ex:
+        domain = reg_ex.group(1)
+        print(domain)
+        url = 'https://www.' + domain
+        webbrowser.open(url)
+        say('The website you have requested has been successfully opened for you, Sir.')
+    else:
+        pass
+
 
 def get_weather(cityPhrase):
     reg_ex = re.search('weather in (.*)', cityPhrase)
@@ -33,19 +55,25 @@ def get_weather(cityPhrase):
 
         print(weather_report)
         say(weather_report)
+    else:
+        pass
 
 
 def get_localtime():
     pass
 
+
 def get_news(limit):
     pass
+
 
 def search_topic(topic):
     pass
 
+
 def get_joke():
     pass
+
 
 def listen():
     speech, r = '', sr.Recognizer()
@@ -56,8 +84,11 @@ def listen():
     try:
         speech = r.recognize_google(audio).lower()
         print('You said: ' + speech + '\n')
-    except sr.UnknownValueError or sr.RequestError: print('....')
-    finally: return speech
+    except sr.UnknownValueError or sr.RequestError:
+        print('....')
+    finally:
+        return speech
+
 
 def say(text):
     engine = pyttsx3.init()
@@ -66,6 +97,7 @@ def say(text):
     engine.say(text)
     engine.runAndWait()
     engine.stop()
+
 
 def assistant(text_speech):
     pass
