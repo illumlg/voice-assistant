@@ -3,6 +3,7 @@ import sys
 import webbrowser
 import pyttsx3
 import speech_recognition as sr
+import datetime
 from pyowm import OWM
 
 from time import strftime
@@ -60,7 +61,8 @@ def get_weather(cityPhrase):
 
 
 def get_localtime():
-    pass
+    now = datetime.datetime.now();
+    say('Current time is %d hours %d minutes' % (now.hour, now.minute))
 
 
 def get_news(limit):
