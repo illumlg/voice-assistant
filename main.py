@@ -1,11 +1,22 @@
+import sys
+
 import pyttsx3
 import speech_recognition as sr
 
+from time import strftime
+
 def run_greeting():
-    pass
+    time = int(strftime('%H'))
+    if 4 <= time < 12:
+        say('Hello Sir. Good morning')
+    elif 12 <= time < 18:
+        say('Hello Sir. Good afternoon')
+    else:
+        say('Hello Sir. Good evening')
 
 def shutdown():
-    pass
+    say('Goodbye Sir. Have a pleasant day')
+    sys.exit()
 
 def open_website(name):
     pass
