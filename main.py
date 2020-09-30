@@ -1,3 +1,4 @@
+import requests
 from pygooglenews import GoogleNews
 import pyttsx3
 import speech_recognition as sr
@@ -5,6 +6,7 @@ import re
 import sys
 import webbrowser
 import datetime
+import wikipedia
 from pyowm import OWM
 from time import strftime
 
@@ -61,7 +63,7 @@ def get_weather(cityPhrase):
 
 
 def get_localtime():
-    now = datetime.datetime.now();
+    now = datetime.datetime.now()
     say('Current time is %d hours %d minutes' % (now.hour, now.minute))
 
 
@@ -75,12 +77,30 @@ def get_news(limit=4):
     except Exception as e: print(e)
 
 
-def search_topic(topic):
-    pass
+def search_topic(topic_phrase):
+    reg_ex = re.search('tell me about (.*)', topic_phrase)
+    try:
+        if reg_ex:
+            topic = reg_ex.group(1)
+
+            ny = wikipedia.page(topic)
+            text = ny.summary[0:1000]
+
+            print(text)
+            say(text)
+    except Exception as e:
+        print(e)
+        say(e)
 
 
 def get_joke():
-    pass
+    res = requests.get(
+        'https://icanhazdadjoke.com/',
+        headers={"Accept": "application/json"})
+    if res.status_code == requests.codes.ok:
+        say(str(res.json()['joke']))
+    else:
+        say('oops!I ran out of jokes')
 
 
 def listen():
@@ -100,7 +120,7 @@ def listen():
 
 def say(text):
     engine = pyttsx3.init()
-    engine.setProperty('voice', engine.getProperty('voices')[1].id)
+    engine.setProperty('voice', engine.getProperty('voices')[0].id)
     engine.setProperty('rate', 130)
     engine.say(text)
     engine.runAndWait()
