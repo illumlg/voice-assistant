@@ -1,3 +1,4 @@
+import requests
 from pygooglenews import GoogleNews
 import pyttsx3
 import speech_recognition as sr
@@ -93,7 +94,13 @@ def search_topic(topic_phrase):
 
 
 def get_joke():
-    pass
+    res = requests.get(
+        'https://icanhazdadjoke.com/',
+        headers={"Accept": "application/json"})
+    if res.status_code == requests.codes.ok:
+        say(str(res.json()['joke']))
+    else:
+        say('oops!I ran out of jokes')
 
 
 def listen():
