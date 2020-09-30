@@ -1,28 +1,30 @@
-import requests
-from pygooglenews import GoogleNews
-import pyttsx3
-import speech_recognition as sr
+import datetime
 import re
+import requests
 import sys
 import webbrowser
-import datetime
+
+import pyttsx3
+import speech_recognition as sr
 import wikipedia
-from pyowm import OWM
+
 from time import strftime
+from pygooglenews import GoogleNews
+from pyowm import OWM
 
 
 def run_greeting():
     time = int(strftime('%H'))
     if 4 <= time < 12:
-        say('Hello Sir. Good morning')
+        say('Hello Sir, good morning')
     elif 12 <= time < 18:
-        say('Hello Sir. Good afternoon')
+        say('Hello Sir, good afternoon')
     else:
-        say('Hello Sir. Good evening')
+        say('Hello Sir, good evening')
 
 
 def shutdown():
-    say('Goodbye Sir. Have a pleasant day')
+    say('Goodbye Sir, have a pleasant day')
     sys.exit()
 
 
@@ -31,15 +33,15 @@ def open_website(name):
     if reg_ex:
         domain = reg_ex.group(1)
         print(domain)
-        url = 'https://www.' + domain
+        url = 'https://www.' + domain + '.com'
         webbrowser.open(url)
-        say('The website you have requested has been successfully opened for you, Sir.')
+        say('The website you have requested has been successfully opened for you, Sir')
     else:
         pass
 
 
-def get_weather(cityPhrase):
-    reg_ex = re.search('weather in (.*)', cityPhrase)
+def get_weather(city_phrase):
+    reg_ex = re.search('weather in (.*)', city_phrase)
     if reg_ex:
         city = reg_ex.group(1)
 
@@ -48,13 +50,13 @@ def get_weather(cityPhrase):
         weather = manager.weather_at_place(city).weather
 
         status = weather.status
-        detailedStatus = weather.detailed_status
+        detailed_status = weather.detailed_status
         temperature = weather.temperature('celsius')
         humidity = weather.humidity
 
-        weather_report = 'Current weather in %s is %s (%s). The temperature is %0.1f degree celcius,' \
+        weather_report = 'Current weather in %s is %s (%s). The temperature is %0.1f degree Celsius,' \
                          ' feels like is %0.1f. The humidity is %s percents' % (
-                             city, status, detailedStatus, temperature['temp'], temperature['feels_like'], humidity)
+                             city, status, detailed_status, temperature['temp'], temperature['feels_like'], humidity)
 
         print(weather_report)
         say(weather_report)
@@ -64,7 +66,9 @@ def get_weather(cityPhrase):
 
 def get_localtime():
     now = datetime.datetime.now()
-    say('Current time is %d hours %d minutes' % (now.hour, now.minute))
+    report = 'Current time is %d hours %d minutes' % (now.hour, now.minute)
+    print(report)
+    say(report)
 
 
 def get_news(limit=4):
@@ -72,9 +76,10 @@ def get_news(limit=4):
         google_news = GoogleNews().top_news()['entries']
         limit = limit if 0 <= limit <= len(google_news) else len(google_news)
         for news in google_news[:limit]:
-            print(news['title'],'\n',news['link'])
+            print(news['title'], '\n', news['link'])
             say(news['title'])
-    except Exception as e: print(e)
+    except Exception as e:
+        print(e)
 
 
 def search_topic(topic_phrase):
@@ -98,9 +103,11 @@ def get_joke():
         'https://icanhazdadjoke.com/',
         headers={"Accept": "application/json"})
     if res.status_code == requests.codes.ok:
-        say(str(res.json()['joke']))
+        joke = str(res.json()['joke'])
+        print(joke)
+        say(joke)
     else:
-        say('oops!I ran out of jokes')
+        say('Oops! I ran out of jokes')
 
 
 def listen():
@@ -120,7 +127,7 @@ def listen():
 
 def say(text):
     engine = pyttsx3.init()
-    engine.setProperty('voice', engine.getProperty('voices')[0].id)
+    engine.setProperty('voice', engine.getProperty('voices')[1].id)
     engine.setProperty('rate', 130)
     engine.say(text)
     engine.runAndWait()
@@ -128,4 +135,23 @@ def say(text):
 
 
 def assistant(text_speech):
-    pass
+    if 'hello' in text_speech:
+        run_greeting()
+    elif 'shut down' in text_speech:
+        shutdown()
+    elif 'open' in text_speech:
+        open_website(text_speech)
+    elif 'weather in' in text_speech:
+        get_weather(text_speech)
+    elif 'time' in text_speech:
+        get_localtime()
+    elif 'news for today' in text_speech:
+        get_news()
+    elif 'joke' in text_speech:
+        get_joke()
+    elif 'tell me about' in text_speech:
+        search_topic(text_speech)
+
+
+while True:
+    assistant(listen())
